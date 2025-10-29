@@ -14,7 +14,7 @@
   <style>
     /* ====== 基础风格 ====== */
     body {
-      font-family: 'Noto Serif TC', 'Courier New', Courier, monospace;
+      font-family: 'Courier New', Courier, monospace, 'Noto Serif TC';
       background-color: #f1f1f1;
       color: #222;
       line-height: 1.8;
@@ -185,7 +185,7 @@
     function loadDiary() {
       const diaries = JSON.parse(localStorage.getItem("diaries") || "[]");
       list.innerHTML = "";
-      diaries.forEach((d, i) => {
+      diaries.forEach((d) => {
         const li = document.createElement("li");
         li.className = "diary-entry";
         li.innerHTML = `<strong>${d.date}</strong><br>${d.text}`;
@@ -193,17 +193,30 @@
       });
     }
 
-    // ====== 音樂播放控制 ======
+    // ====== 音樂播放控制（更穩定）======
     const music = document.getElementById("bgm");
     const musicBtn = document.getElementById("musicBtn");
 
-    musicBtn.onclick = function() {
-      if (music.paused) {
-        music.play();
-        musicBtn.textContent = "⏸ 暫停音樂";
-      } else {
-        music.pause();
-        musicBtn.textContent = "▶️ 播放音樂";
+    music.addEventListener("play", () => {
+      musicBtn.textContent = "⏸ 暫停音樂";
+    });
+    music.addEventListener("pause", () => {
+      musicBtn.textContent = "▶️ 播放音樂";
+    });
+    music.addEventListener("error", () => {
+      alert("音樂檔載入失敗：請確認根目錄有文件名【music.mp3】（大小寫一致），且 index.html 的 <audio> src=\"music.mp3\"。");
+    });
+
+    musicBtn.onclick = async function () {
+      try {
+        if (music.paused) {
+          await music.play();
+        } else {
+          music.pause();
+        }
+      } catch (e) {
+        console.warn(e);
+        alert("無法播放：可能是 music.mp3 路徑/名稱不對，或瀏覽器阻止自動播放。請先手動點按一次再試，並確認檔案存在。");
       }
     };
   </script>
