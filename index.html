@@ -8,18 +8,23 @@
   <!-- 小图标 favicon -->
   <link rel="icon" type="image/png" href="favicon.png" />
 
-  <!-- 字体（思源宋体繁体 + Courier） -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&display=swap" rel="stylesheet">
+  <!-- 字体：I.Ming Webfont（ORADANO 明朝体） -->
+  <link href="https://cdn.jsdelivr.net/gh/ichitenfont/I.MingWebfont/stylesheet.css" rel="stylesheet">
 
   <style>
-    /* ====== 基础风格 ====== */
     body {
-      font-family: 'Courier New', Courier, monospace, 'Noto Serif TC';
-      background-color: #f1f1f1;
-      color: #222;
+      font-family: 'Courier New', Courier, monospace, 'I.Ming';
+      background-color: #738E87;
+      color: #415C53;
       line-height: 1.8;
       margin: 0;
       padding: 40px 15px;
+      transition: background 0.5s, color 0.5s;
+    }
+
+    body.dark {
+      background-color: #1e1f1e;
+      color: #d0e0d4;
     }
 
     header {
@@ -35,11 +40,10 @@
 
     .subtitle {
       font-size: 1rem;
-      color: #555;
+      color: #415C53;
     }
 
-    /* ====== 编辑器区域 ====== */
-    .editor {
+    .editor, .saved, .guestbook {
       text-align: center;
       margin-bottom: 50px;
     }
@@ -58,11 +62,7 @@
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
 
-    .buttons {
-      margin-top: 15px;
-    }
-
-    button {
+    button, select, input[type="file"] {
       font-family: inherit;
       font-size: 1rem;
       border: 1px solid #666;
@@ -75,28 +75,21 @@
       transition: 0.3s;
     }
 
-    button:hover {
+    button:hover, select:hover {
       background: #ddd;
     }
 
-    /* ====== 已保存日记 ====== */
-    .saved {
+    .saved, .guestbook {
       max-width: 700px;
       margin: 0 auto;
     }
 
-    .saved h2 {
-      border-bottom: 1px solid #aaa;
-      padding-bottom: 0.5em;
-      font-weight: 400;
-    }
-
-    #diaryList {
+    #diaryList, #messageList {
       list-style: none;
       padding: 0;
     }
 
-    .diary-entry {
+    .entry, .message {
       background: #fcfcfc;
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -110,11 +103,7 @@
       text-align: center;
       margin-top: 50px;
       font-size: 0.9rem;
-      color: #555;
-    }
-
-    #musicBtn {
-      margin-bottom: 10px;
+      color: #415C53;
     }
   </style>
 </head>
@@ -123,11 +112,14 @@
   <header>
     <h1>Giyunfei’s Digital Diary</h1>
     <p class="subtitle">一頁紙 · 一段思緒 · 一點聲音</p>
+    <button id="toggleMode">🌙 夜間模式</button>
   </header>
 
   <main>
-    <section class="editor">
-      <textarea id="diaryInput" placeholder="在這裡寫下今天的心情、故事或夢境..."></textarea>
+    <!-- 僅作者可見的日記區 -->
+    <section class="editor" id="diarySection" style="display:none;">
+      <textarea id="diaryInput" placeholder="在這裡寫下今天的心情、故事或夢境..."></textarea><br>
+      <input type="file" id="imgUpload" accept="image/*"><br>
       <div class="buttons">
         <button id="saveBtn">💾 儲存</button>
         <button id="clearBtn">🗑 清除</button>
@@ -138,42 +130,85 @@
       <h2>🕯 我的日記</h2>
       <ul id="diaryList"></ul>
     </section>
+
+    <section class="guestbook">
+      <h2>💬 留言板</h2>
+      <textarea id="guestInput" placeholder="留下你的話..."></textarea><br>
+      <button id="guestBtn">發佈留言</button>
+      <ul id="messageList"></ul>
+    </section>
   </main>
 
   <footer>
-    <button id="musicBtn">▶️ 播放音樂</button>
-    <audio id="bgm" src="music.mp3.mp3" loop></audio>
+    <div>
+      <select id="bgmSelect">
+        <option value="music.mp3.mp3">🎵 主題音樂</option>
+        <option value="https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3">🦖 範例音效</option>
+      </select>
+      <button id="musicBtn">▶️ 播放音樂</button>
+      <audio id="bgm" src="music.mp3.mp3" loop></audio>
+    </div>
     <p>© 2025 Giyunfei — Printed on Digital Paper</p>
   </footer>
 
   <script>
-    // ====== 本地儲存與日記管理 ======
-    const input = document.getElementById("diaryInput");
-    const list = document.getElementById("diaryList");
+    /* ====== 基本元件 ====== */
+    const diarySection = document.getElementById("diarySection");
+    const diaryInput = document.getElementById("diaryInput");
+    const imgUpload = document.getElementById("imgUpload");
+    const diaryList = document.getElementById("diaryList");
     const saveBtn = document.getElementById("saveBtn");
     const clearBtn = document.getElementById("clearBtn");
 
-    // 初始化
-    window.onload = function() {
+    const guestInput = document.getElementById("guestInput");
+    const guestBtn = document.getElementById("guestBtn");
+    const messageList = document.getElementById("messageList");
+
+    const music = document.getElementById("bgm");
+    const musicBtn = document.getElementById("musicBtn");
+    const bgmSelect = document.getElementById("bgmSelect");
+    const toggleMode = document.getElementById("toggleMode");
+
+    /* ====== 啟動權限：作者驗證 ====== */
+    const pwd = prompt("請輸入管理密碼以進入編輯模式（訪客請留空）：");
+    if (pwd === "giyunfei") diarySection.style.display = "block";
+
+    /* ====== 日記管理 ====== */
+    window.onload = () => {
       loadDiary();
+      loadMessages();
     };
 
-    // 儲存日記
+    let imageData = "";
+
+    imgUpload.addEventListener("change", function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imageData = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
     saveBtn.onclick = function() {
-      const text = input.value.trim();
+      const text = diaryInput.value.trim();
       if (text === "") return alert("寫點什麼再儲存吧 ✏️");
       const entry = {
         text: text,
-        date: new Date().toLocaleString("zh-TW")
+        date: new Date().toLocaleString("zh-TW"),
+        img: imageData
       };
       let diaries = JSON.parse(localStorage.getItem("diaries") || "[]");
       diaries.unshift(entry);
       localStorage.setItem("diaries", JSON.stringify(diaries));
-      input.value = "";
+      diaryInput.value = "";
+      imgUpload.value = "";
+      imageData = "";
       loadDiary();
     };
 
-    // 清除全部日記
     clearBtn.onclick = function() {
       if (confirm("確定要刪除所有日記嗎？")) {
         localStorage.removeItem("diaries");
@@ -181,33 +216,45 @@
       }
     };
 
-    // 載入日記
     function loadDiary() {
       const diaries = JSON.parse(localStorage.getItem("diaries") || "[]");
-      list.innerHTML = "";
+      diaryList.innerHTML = "";
       diaries.forEach((d) => {
         const li = document.createElement("li");
-        li.className = "diary-entry";
-        li.innerHTML = `<strong>${d.date}</strong><br>${d.text}`;
-        list.appendChild(li);
+        li.className = "entry";
+        li.innerHTML = `<strong>${d.date}</strong><br>${d.text}${d.img ? "<br><img src='"+d.img+"' style='max-width:100%;border-radius:6px;margin-top:6px;'/>" : ""}`;
+        diaryList.appendChild(li);
       });
     }
 
-    // ====== 音樂播放控制（更穩定）======
-    const music = document.getElementById("bgm");
-    const musicBtn = document.getElementById("musicBtn");
+    /* ====== 留言板 ====== */
+    guestBtn.onclick = function() {
+      const msg = guestInput.value.trim();
+      if (msg === "") return;
+      const entry = {
+        msg: msg,
+        date: new Date().toLocaleString("zh-TW")
+      };
+      let msgs = JSON.parse(localStorage.getItem("guestbook") || "[]");
+      msgs.unshift(entry);
+      localStorage.setItem("guestbook", JSON.stringify(msgs));
+      guestInput.value = "";
+      loadMessages();
+    };
 
-    music.addEventListener("play", () => {
-      musicBtn.textContent = "⏸ 暫停音樂";
-    });
-    music.addEventListener("pause", () => {
-      musicBtn.textContent = "▶️ 播放音樂";
-    });
-    music.addEventListener("error", () => {
-      alert("音樂檔載入失敗：請確認根目錄有文件名【music.mp3】（大小寫一致），且 index.html 的 <audio> src=\"music.mp3\"。");
-    });
+    function loadMessages() {
+      const msgs = JSON.parse(localStorage.getItem("guestbook") || "[]");
+      messageList.innerHTML = "";
+      msgs.forEach((m) => {
+        const li = document.createElement("li");
+        li.className = "message";
+        li.innerHTML = `<strong>${m.date}</strong><br>${m.msg}`;
+        messageList.appendChild(li);
+      });
+    }
 
-    musicBtn.onclick = async function () {
+    /* ====== 音樂播放控制 ====== */
+    musicBtn.onclick = async function() {
       try {
         if (music.paused) {
           await music.play();
@@ -216,8 +263,20 @@
         }
       } catch (e) {
         console.warn(e);
-        alert("無法播放：可能是 music.mp3 路徑/名稱不對，或瀏覽器阻止自動播放。請先手動點按一次再試，並確認檔案存在。");
+        alert("無法播放音樂，請檢查檔案是否存在。");
       }
+    };
+
+    bgmSelect.onchange = function() {
+      music.src = this.value;
+      music.play();
+      musicBtn.textContent = "⏸ 暫停音樂";
+    };
+
+    /* ====== 夜間模式 ====== */
+    toggleMode.onclick = function() {
+      document.body.classList.toggle("dark");
+      toggleMode.textContent = document.body.classList.contains("dark") ? "☀️ 日間模式" : "🌙 夜間模式";
     };
   </script>
 </body>
