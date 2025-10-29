@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giyunfei’s Digital Diary</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Giyunfei’s Digital Diary</h1>
+    <p class="subtitle">一頁紙、一段思緒、一點聲音</p>
+  </header>
+
+  <main>
+    <section class="editor">
+      <textarea id="diaryInput" placeholder="在這裡寫下今天的心情、故事或夢境..."></textarea>
+      <div class="buttons">
+        <button id="saveBtn">💾 儲存</button>
+        <button id="clearBtn">🗑 清除</button>
+      </div>
+    </section>
+
+    <section class="saved">
+      <h2>🕯 我的日記</h2>
+      <ul id="diaryList"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <button id="musicBtn">▶️ 播放音樂</button>
+    <audio id="bgm" src="music.mp3" loop></audio>
+    <p>© 2025 Giyunfei — Printed on Digital Paper</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
