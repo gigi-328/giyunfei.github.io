@@ -4,107 +4,59 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Giyunfei’s Digital Diary</title>
-  
-  <!-- 小图标 favicon -->
   <link rel="icon" type="image/png" href="favicon.png" />
-
-  <!-- 字体：I.Ming Webfont（ORADANO 明朝体） -->
   <link href="https://cdn.jsdelivr.net/gh/ichitenfont/I.MingWebfont/stylesheet.css" rel="stylesheet">
 
   <style>
     body {
       font-family: 'Courier New', Courier, monospace, 'I.Ming';
-      background-color: #738E87;
-      color: #415C53;
+      background-color: #9bb3ac;
+      color: #2e453e;
       line-height: 1.8;
       margin: 0;
       padding: 40px 15px;
       transition: background 0.5s, color 0.5s;
     }
-
     body.dark {
-      background-color: #1e1f1e;
-      color: #d0e0d4;
+      background-color: #3b3b3b;
+      color: #bfbfbf;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
+    header { text-align:center; margin-bottom:40px; }
+    h1 { font-size:2.4rem; font-weight:500; letter-spacing:0.05em; }
+    .subtitle { font-size:1rem; color:#2e453e; }
 
-    h1 {
-      font-size: 2.4rem;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-    }
-
-    .subtitle {
-      font-size: 1rem;
-      color: #415C53;
-    }
-
-    .editor, .saved, .guestbook {
-      text-align: center;
-      margin-bottom: 50px;
-    }
-
+    .editor,.saved,.guestbook { text-align:center; margin-bottom:50px; }
     textarea {
-      width: 90%;
-      max-width: 700px;
-      height: 180px;
-      font-family: inherit;
-      font-size: 1rem;
-      padding: 10px;
-      border: 1px solid #999;
-      border-radius: 4px;
-      background: #fafafa;
-      resize: none;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      width:90%; max-width:700px; height:180px;
+      font-family:inherit; font-size:1rem; padding:10px;
+      border:1px solid #999; border-radius:4px;
+      background:#fafafa; resize:none; box-shadow:0 0 5px rgba(0,0,0,0.1);
+    }
+    body.dark textarea { background:#555; color:#eee; border-color:#888; }
+
+    button,select,input[type="file"] {
+      font-family:inherit; font-size:1rem;
+      border:1px solid #666; background:#eee; color:#333;
+      border-radius:4px; margin:5px; padding:6px 14px; cursor:pointer; transition:0.3s;
+    }
+    button:hover,select:hover{ background:#ddd; }
+    body.dark button,body.dark select{ background:#666; color:#eee; border-color:#999; }
+    body.dark button:hover,body.dark select:hover{ background:#777; }
+
+    .saved,.guestbook{ max-width:700px; margin:0 auto; }
+    #diaryList,#messageList{ list-style:none; padding:0; }
+
+    .entry,.message{
+      background:#fcfcfc; border:1px solid #ccc; border-radius:4px;
+      padding:10px 15px; margin-bottom:10px; white-space:pre-wrap; text-align:left;
+    }
+    body.dark .entry,body.dark .message{
+      background:#4a4a4a; border-color:#777; color:#ddd;
     }
 
-    button, select, input[type="file"] {
-      font-family: inherit;
-      font-size: 1rem;
-      border: 1px solid #666;
-      background: #eee;
-      color: #333;
-      border-radius: 4px;
-      margin: 5px;
-      padding: 6px 14px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover, select:hover {
-      background: #ddd;
-    }
-
-    .saved, .guestbook {
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    #diaryList, #messageList {
-      list-style: none;
-      padding: 0;
-    }
-
-    .entry, .message {
-      background: #fcfcfc;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      padding: 10px 15px;
-      margin-bottom: 10px;
-      white-space: pre-wrap;
-      text-align: left;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 50px;
-      font-size: 0.9rem;
-      color: #415C53;
-    }
+    footer{ text-align:center; margin-top:50px; font-size:0.9rem; color:#2e453e; }
+    body.dark footer{ color:#bfbfbf; }
   </style>
 </head>
 
@@ -116,7 +68,6 @@
   </header>
 
   <main>
-    <!-- 僅作者可見的日記區 -->
     <section class="editor" id="diarySection" style="display:none;">
       <textarea id="diaryInput" placeholder="在這裡寫下今天的心情、故事或夢境..."></textarea><br>
       <input type="file" id="imgUpload" accept="image/*"><br>
@@ -152,131 +103,102 @@
   </footer>
 
   <script>
-    /* ====== 基本元件 ====== */
-    const diarySection = document.getElementById("diarySection");
-    const diaryInput = document.getElementById("diaryInput");
-    const imgUpload = document.getElementById("imgUpload");
-    const diaryList = document.getElementById("diaryList");
-    const saveBtn = document.getElementById("saveBtn");
-    const clearBtn = document.getElementById("clearBtn");
+    const diarySection=document.getElementById("diarySection"),
+          diaryInput=document.getElementById("diaryInput"),
+          imgUpload=document.getElementById("imgUpload"),
+          diaryList=document.getElementById("diaryList"),
+          saveBtn=document.getElementById("saveBtn"),
+          clearBtn=document.getElementById("clearBtn"),
+          guestInput=document.getElementById("guestInput"),
+          guestBtn=document.getElementById("guestBtn"),
+          messageList=document.getElementById("messageList"),
+          music=document.getElementById("bgm"),
+          musicBtn=document.getElementById("musicBtn"),
+          bgmSelect=document.getElementById("bgmSelect"),
+          toggleMode=document.getElementById("toggleMode");
 
-    const guestInput = document.getElementById("guestInput");
-    const guestBtn = document.getElementById("guestBtn");
-    const messageList = document.getElementById("messageList");
+    /* ====== 密碼保護 ====== */
+    const pwd=prompt("請輸入管理密碼以進入編輯模式（訪客請留空）：");
+    if(pwd==="giyunfei") diarySection.style.display="block";
 
-    const music = document.getElementById("bgm");
-    const musicBtn = document.getElementById("musicBtn");
-    const bgmSelect = document.getElementById("bgmSelect");
-    const toggleMode = document.getElementById("toggleMode");
+    window.onload=()=>{loadDiary();loadMessages();};
 
-    /* ====== 啟動權限：作者驗證 ====== */
-    const pwd = prompt("請輸入管理密碼以進入編輯模式（訪客請留空）：");
-    if (pwd === "giyunfei") diarySection.style.display = "block";
-
-    /* ====== 日記管理 ====== */
-    window.onload = () => {
-      loadDiary();
-      loadMessages();
-    };
-
-    let imageData = "";
-
-    imgUpload.addEventListener("change", function() {
-      const file = this.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          imageData = e.target.result;
-        };
-        reader.readAsDataURL(file);
+    let imageData="";
+    imgUpload.addEventListener("change",function(){
+      const f=this.files[0];
+      if(f){const r=new FileReader();
+        r.onload=e=>imageData=e.target.result;
+        r.readAsDataURL(f);
       }
     });
 
-    saveBtn.onclick = function() {
-      const text = diaryInput.value.trim();
-      if (text === "") return alert("寫點什麼再儲存吧 ✏️");
-      const entry = {
-        text: text,
-        date: new Date().toLocaleString("zh-TW"),
-        img: imageData
-      };
-      let diaries = JSON.parse(localStorage.getItem("diaries") || "[]");
-      diaries.unshift(entry);
-      localStorage.setItem("diaries", JSON.stringify(diaries));
-      diaryInput.value = "";
-      imgUpload.value = "";
-      imageData = "";
-      loadDiary();
+    saveBtn.onclick=function(){
+      const t=diaryInput.value.trim();
+      if(t==="")return alert("寫點什麼再儲存吧 ✏️");
+      const e={text:t,date:new Date().toLocaleString("zh-TW"),img:imageData};
+      let d=JSON.parse(localStorage.getItem("diaries")||"[]");
+      d.unshift(e);localStorage.setItem("diaries",JSON.stringify(d));
+      diaryInput.value="";imgUpload.value="";imageData="";loadDiary();
     };
-
-    clearBtn.onclick = function() {
-      if (confirm("確定要刪除所有日記嗎？")) {
-        localStorage.removeItem("diaries");
-        loadDiary();
-      }
+    clearBtn.onclick=function(){
+      if(confirm("確定要刪除所有日記嗎？")){localStorage.removeItem("diaries");loadDiary();}
     };
-
-    function loadDiary() {
-      const diaries = JSON.parse(localStorage.getItem("diaries") || "[]");
-      diaryList.innerHTML = "";
-      diaries.forEach((d) => {
-        const li = document.createElement("li");
-        li.className = "entry";
-        li.innerHTML = `<strong>${d.date}</strong><br>${d.text}${d.img ? "<br><img src='"+d.img+"' style='max-width:100%;border-radius:6px;margin-top:6px;'/>" : ""}`;
+    function loadDiary(){
+      const d=JSON.parse(localStorage.getItem("diaries")||"[]");
+      diaryList.innerHTML="";
+      d.forEach(x=>{
+        const li=document.createElement("li");
+        li.className="entry";
+        li.innerHTML=`<strong>${x.date}</strong><br>${x.text}${x.img?"<br><img src='"+x.img+"' style='max-width:100%;border-radius:6px;margin-top:6px;'/>":""}`;
         diaryList.appendChild(li);
       });
     }
 
     /* ====== 留言板 ====== */
-    guestBtn.onclick = function() {
-      const msg = guestInput.value.trim();
-      if (msg === "") return;
-      const entry = {
-        msg: msg,
-        date: new Date().toLocaleString("zh-TW")
-      };
-      let msgs = JSON.parse(localStorage.getItem("guestbook") || "[]");
+    guestBtn.onclick=function(){
+      const m=guestInput.value.trim();
+      if(m==="")return;
+      const entry={msg:m,date:new Date().toLocaleString("zh-TW")};
+      let msgs=JSON.parse(localStorage.getItem("guestbook")||"[]");
       msgs.unshift(entry);
-      localStorage.setItem("guestbook", JSON.stringify(msgs));
-      guestInput.value = "";
-      loadMessages();
+      localStorage.setItem("guestbook",JSON.stringify(msgs));
+      guestInput.value="";loadMessages();
     };
-
-    function loadMessages() {
-      const msgs = JSON.parse(localStorage.getItem("guestbook") || "[]");
-      messageList.innerHTML = "";
-      msgs.forEach((m) => {
-        const li = document.createElement("li");
-        li.className = "message";
-        li.innerHTML = `<strong>${m.date}</strong><br>${m.msg}`;
+    function loadMessages(){
+      const msgs=JSON.parse(localStorage.getItem("guestbook")||"[]");
+      messageList.innerHTML="";
+      msgs.forEach(m=>{
+        const li=document.createElement("li");
+        li.className="message";
+        li.innerHTML=`<strong>${m.date}</strong><br>${m.msg}`;
         messageList.appendChild(li);
       });
     }
 
     /* ====== 音樂播放控制 ====== */
-    musicBtn.onclick = async function() {
-      try {
-        if (music.paused) {
+    musicBtn.onclick=async function(){
+      try{
+        if(music.paused){
           await music.play();
-        } else {
+          musicBtn.textContent="⏸ 暫停音樂";
+        }else{
           music.pause();
+          musicBtn.textContent="▶️ 播放音樂";
         }
-      } catch (e) {
+      }catch(e){
         console.warn(e);
         alert("無法播放音樂，請檢查檔案是否存在。");
       }
     };
-
-    bgmSelect.onchange = function() {
-      music.src = this.value;
-      music.play();
-      musicBtn.textContent = "⏸ 暫停音樂";
+    bgmSelect.onchange=function(){
+      music.src=this.value;music.play();
+      musicBtn.textContent="⏸ 暫停音樂";
     };
 
     /* ====== 夜間模式 ====== */
-    toggleMode.onclick = function() {
+    toggleMode.onclick=function(){
       document.body.classList.toggle("dark");
-      toggleMode.textContent = document.body.classList.contains("dark") ? "☀️ 日間模式" : "🌙 夜間模式";
+      toggleMode.textContent=document.body.classList.contains("dark")?"☀️ 日間模式":"🌙 夜間模式";
     };
   </script>
 </body>
