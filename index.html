@@ -1,108 +1,41 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Giyunfei’s Digital Paper</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&display=swap');
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500&display=swap');
-
-    body {
-      margin: 0;
-      padding: 60px 20px;
-      background-color: #f7f5f2;
-      background-image: radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px);
-      background-size: 4px 4px;
-      font-family: 'EB Garamond', 'Noto Serif SC', serif;
-      color: #222;
-      line-height: 1.8;
-      max-width: 720px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    h1 {
-      font-size: 2.2rem;
-      font-weight: 500;
-      margin-bottom: 0.3em;
-      text-align: center;
-      letter-spacing: 0.02em;
-    }
-
-    h2 {
-      font-size: 1.3rem;
-      font-weight: 400;
-      margin-top: 2.5em;
-      border-top: 1px solid #ccc;
-      padding-top: 1em;
-      text-align: center;
-      letter-spacing: 0.03em;
-    }
-
-    p {
-      font-size: 1.05rem;
-      color: #333;
-      text-align: justify;
-      text-indent: 2em;
-    }
-
-    .quote {
-      text-align: center;
-      font-style: italic;
-      font-size: 1.1rem;
-      color: #555;
-      margin: 2.5em 0;
-    }
-
-    .footer {
-      margin-top: 3em;
-      font-size: 0.9rem;
-      color: #777;
-      text-align: center;
-      border-top: 1px solid #ccc;
-      padding-top: 1.5em;
-    }
-
-    a {
-      color: #444;
-      text-decoration: underline dotted;
-      transition: color 0.3s ease;
-    }
-    a:hover {
-      color: #000;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giyunfei’s Digital Diary</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <h1>Giyunfei’s Digital Paper</h1>
-  <div class="quote">“静，是思考的形状。”</div>
+  <header>
+    <h1>Giyunfei’s Digital Diary</h1>
+    <p class="subtitle">一頁紙、一段思緒、一點聲音</p>
+  </header>
 
-  <p>
-    欢迎来到这个安静的角落。  
-    我喜欢用最简单的文字、最温柔的光，记录时间在纸上的痕迹。
-    如果你也在寻找某种慢节奏的呼吸感，  
-    那就随意坐下，听听页面的声音。
-  </p>
+  <main>
+    <section class="editor">
+      <textarea id="diaryInput" placeholder="在這裡寫下今天的心情、故事或夢境..."></textarea>
+      <div class="buttons">
+        <button id="saveBtn">💾 儲存</button>
+        <button id="clearBtn">🗑 清除</button>
+      </div>
+    </section>
 
-  <p>
-    这个网站正在缓慢生长中。未来，这里可能会出现一些短文、影像、
-    或者音乐笔记——就像深夜 Kindle 屏幕上的微光，
-    无声但有温度。
-  </p>
+    <section class="saved">
+      <h2>🕯 我的日記</h2>
+      <ul id="diaryList"></ul>
+    </section>
+  </main>
 
-  <h2>联系</h2>
-  <p style="text-align:center;">
-    <a href="mailto:giyunfei@example.com">✉️ giyunfei@example.com</a><br>
-    <a href="https://github.com/giyunfei" target="_blank">GitHub</a> · 
-    <a href="https://www.instagram.com/" target="_blank">Instagram</a>
-  </p>
+  <footer>
+    <button id="musicBtn">▶️ 播放音樂</button>
+    <audio id="bgm" src="music.mp3" loop></audio>
+    <p>© 2025 Giyunfei — Printed on Digital Paper</p>
+  </footer>
 
-  <div class="footer">
-    Printed on digital paper · © 2025 Giyunfei
-  </div>
-
+  <script src="script.js"></script>
 </body>
 </html>
-
