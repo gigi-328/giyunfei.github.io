@@ -4,15 +4,125 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Giyunfei’s Digital Diary</title>
+  
+  <!-- 小图标 favicon -->
   <link rel="icon" type="image/png" href="favicon.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
 
+  <!-- 字体（思源宋体繁体 + Courier） -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ====== 基础风格 ====== */
+    body {
+      font-family: 'Noto Serif TC', 'Courier New', Courier, monospace;
+      background-color: #f1f1f1;
+      color: #222;
+      line-height: 1.8;
+      margin: 0;
+      padding: 40px 15px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: #555;
+    }
+
+    /* ====== 编辑器区域 ====== */
+    .editor {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    textarea {
+      width: 90%;
+      max-width: 700px;
+      height: 180px;
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 10px;
+      border: 1px solid #999;
+      border-radius: 4px;
+      background: #fafafa;
+      resize: none;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .buttons {
+      margin-top: 15px;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 1rem;
+      border: 1px solid #666;
+      background: #eee;
+      color: #333;
+      border-radius: 4px;
+      margin: 5px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #ddd;
+    }
+
+    /* ====== 已保存日记 ====== */
+    .saved {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .saved h2 {
+      border-bottom: 1px solid #aaa;
+      padding-bottom: 0.5em;
+      font-weight: 400;
+    }
+
+    #diaryList {
+      list-style: none;
+      padding: 0;
+    }
+
+    .diary-entry {
+      background: #fcfcfc;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+      text-align: left;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    #musicBtn {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
   <header>
     <h1>Giyunfei’s Digital Diary</h1>
-    <p class="subtitle">一頁紙、一段思緒、一點聲音</p>
+    <p class="subtitle">一頁紙 · 一段思緒 · 一點聲音</p>
   </header>
 
   <main>
@@ -36,6 +146,66 @@
     <p>© 2025 Giyunfei — Printed on Digital Paper</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script>
+    // ====== 本地儲存與日記管理 ======
+    const input = document.getElementById("diaryInput");
+    const list = document.getElementById("diaryList");
+    const saveBtn = document.getElementById("saveBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    // 初始化
+    window.onload = function() {
+      loadDiary();
+    };
+
+    // 儲存日記
+    saveBtn.onclick = function() {
+      const text = input.value.trim();
+      if (text === "") return alert("寫點什麼再儲存吧 ✏️");
+      const entry = {
+        text: text,
+        date: new Date().toLocaleString("zh-TW")
+      };
+      let diaries = JSON.parse(localStorage.getItem("diaries") || "[]");
+      diaries.unshift(entry);
+      localStorage.setItem("diaries", JSON.stringify(diaries));
+      input.value = "";
+      loadDiary();
+    };
+
+    // 清除全部日記
+    clearBtn.onclick = function() {
+      if (confirm("確定要刪除所有日記嗎？")) {
+        localStorage.removeItem("diaries");
+        loadDiary();
+      }
+    };
+
+    // 載入日記
+    function loadDiary() {
+      const diaries = JSON.parse(localStorage.getItem("diaries") || "[]");
+      list.innerHTML = "";
+      diaries.forEach((d, i) => {
+        const li = document.createElement("li");
+        li.className = "diary-entry";
+        li.innerHTML = `<strong>${d.date}</strong><br>${d.text}`;
+        list.appendChild(li);
+      });
+    }
+
+    // ====== 音樂播放控制 ======
+    const music = document.getElementById("bgm");
+    const musicBtn = document.getElementById("musicBtn");
+
+    musicBtn.onclick = function() {
+      if (music.paused) {
+        music.play();
+        musicBtn.textContent = "⏸ 暫停音樂";
+      } else {
+        music.pause();
+        musicBtn.textContent = "▶️ 播放音樂";
+      }
+    };
+  </script>
 </body>
 </html>
